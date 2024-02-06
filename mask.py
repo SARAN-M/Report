@@ -33,8 +33,33 @@ def display_page(page_num):
     st.data_editor(
         page_data,
         column_config={
-            # ... your column configuration ...
-        },
+        "tokenName": st.column_config.TextColumn(
+            "Token Name",
+            help="Streamlit **widget** commands 🎈",
+            default="st.",
+            max_chars=50,
+            validate="^st\.[a-z_]+$",
+        ),
+        "category": st.column_config.SelectboxColumn(
+            "App Category",
+            help="The category of the app",
+            width="medium",
+            options=[
+                "📊 Data Exploration",
+                "📈 Data Visualization",
+                "🤖 LLM",
+            ],
+            required=True,
+        ),
+        "price": st.column_config.NumberColumn(
+            "Price (in USD)",
+            help="The price of the product in USD",
+            min_value=0,
+            max_value=1000,
+            step=1,
+            format="$%d",
+        )
+    },
         hide_index=True,
         key=unique_key,  # Assign the unique key
     )
