@@ -134,6 +134,7 @@ def display_page(page_num, isDFEmpty):
     if query:
         search_mask = page_data.applymap(lambda x: query.lower() in str(x).lower()).any(axis=1)
         page_data = page_data[search_mask]
+        st.session_state['table'] =page_data
 
     # Generate a unique key for the DataEditor
     unique_key = f"data_editor_{page_num}"
