@@ -115,39 +115,40 @@ def on_change(data):
 
 # Function to display a paginated data editor with advanced search
 def display_page(page_num, isDFEmpty):
-    print('display_page',isDFEmpty)
-        # API data handling (replace with actual logic)
+    # API data handling (replace with actual logic)
     api_data = mask_api_configuration_data()
     columns = format_data(api_data["data"]["columns"])
-    if isDFEmpty:
-        data_df =  pd.DataFrame(api_data["data"]["data"])
-        start_index = (page_num - 1) * page_size
-        end_index = start_index + page_size
-        page_data = data_df.iloc[start_index:end_index]
+    
+    if st.session_state['table'].empty:
+        data_df = pd.DataFrame(api_data["data"]["data"])
+        st.session_state['table'] = data_df  # Set the table session state with the DataFrame
+    else:
+        data_df = st.session_state['table']
+    
+    start_index = (page_num - 1) * page_size
+    end_index = start_index + page_size
+    page_data = data_df.iloc[start_index:end_index]
 
     # Search functionality:
-        query = st.text_input("Search", placeholder="Enter search term(s)")
-        if query:
-            search_mask = page_data.applymap(lambda x: query.lower() in str(x).lower()).any(axis=1)
-            page_data = page_data[search_mask]
-        st.session_state['table'] = page_data
-        # Generate a unique key for the DataEditor
-        unique_key = f"data_editor_{page_num}"
+    query = st.text_input("Search", placeholder="Enter search term(s)")
+    if query:
+        search_mask = page_data.applymap(lambda x: query.lower() in str(x).lower()).any(axis=1)
+        page_data = page_data[search_mask]
+
+    # Generate a unique key for the DataEditor
+    unique_key = f"data_editor_{page_num}"
 
     # Display the DataEditor with updated data and columns:
-        print("secondddddd")
-        print(page_data)
-        data = st.data_editor(
+    data = st.data_editor(
         st.session_state['table'].to_dict(orient="records"),
         column_config=columns,
         hide_index=True,
         key=unique_key,
-        num_rows ="dynamic"
+        num_rows="dynamic"
     )
-    # st.session_state['table'] = data
-        on_change(data)
 
-    
+    # Update session state with the edited data
+    st.session_state['table'].iloc[start_index:end_index] = pd.DataFrame(data)
 
     # Pagination buttons and page display:
     # Calculate total pages, display buttons, etc.
