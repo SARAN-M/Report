@@ -147,9 +147,17 @@ def display_page(page_num, isDFEmpty):
         key=unique_key,
         num_rows="dynamic"
     )
-
+    edited_data_df = pd.DataFrame(data)
+    if len(edited_data_df) > len(page_data):
+        # New rows have been added
+        added_rows = edited_data_df.iloc[len(page_data):]
+        data_df = pd.concat([data_df, added_rows], ignore_index=True)
+        st.session_state['table'] = data_df
+    else:
+        data_df.iloc[start_index:end_index] = edited_data_df
     # Update session state with the edited data
     st.session_state['table'].iloc[start_index:end_index] = pd.DataFrame(data)
+    print(data)
 
     # Pagination buttons and page display:
     # Calculate total pages, display buttons, etc.
